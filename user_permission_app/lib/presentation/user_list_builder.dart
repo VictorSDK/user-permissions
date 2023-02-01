@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:user_permission_app/data/models/user.dart';
+import 'package:user_permission_app/presentation/user_permissions_edit_screen.dart';
 import 'package:user_permission_app/presentation/user_permissions_screen.dart';
 
 class UserListBuilder extends StatefulWidget {
@@ -30,7 +31,16 @@ class _UserListBuilderState extends State<UserListBuilder> {
               ),
             )
           },
-          title: Text('${user.id} - ${user.firstName} ${user.lastName}')
+            title: Text('${user.id} - ${user.firstName} ${user.lastName}'),
+            trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => UserPermissionEditScreen(user: user),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.edit))
         );
       },
     );
