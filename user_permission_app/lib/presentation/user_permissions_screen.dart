@@ -31,10 +31,13 @@ class UserPermissionScreen extends StatelessWidget {
             return Center(
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Permissions', style: Theme.of(context).textTheme.titleLarge),
                 if (model.permissions.isNotEmpty)
                   ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
                     itemCount: model.permissions.length,
                     itemBuilder: (context, index) {
                       return ListTile(title: Text(model.permissions[index]));
@@ -46,10 +49,11 @@ class UserPermissionScreen extends StatelessWidget {
                 Text('Roles', style: Theme.of(context).textTheme.titleLarge),
                 if (model.roles.isNotEmpty)
                   ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
                     itemCount: model.roles.length,
                     itemBuilder: (context, index) {
-                      final role = model.roles[index];
-                      return ListTile(title: Text(role.name));
+                      return ListTile(title: Text(model.roles[index]));
                     },
                   )
                 else

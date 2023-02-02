@@ -1,68 +1,163 @@
+import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:user_permission_app/data/models/user.dart';
+import 'package:user_permission_app/data/models/models.dart' as data;
+import 'package:user_permission_app/data/repositories/permission_repository.dart';
+import 'package:user_permission_app/data/repositories/role_repository.dart';
 import 'package:user_permission_app/data/repositories/user_permissions_repository.dart';
 import 'package:user_permission_app/domain/models/user_permissions.dart';
 
-class UserPermissionEditScreen extends StatelessWidget {
+class UserPermissionEditScreen extends StatefulWidget {
   const UserPermissionEditScreen({super.key, required this.user});
+  final data.User user;
 
-  final User user;
+  @override
+  State<UserPermissionEditScreen> createState() => _UserPermissionEditScreen();
+}
 
-  Future<UserPermissions> _getUserPermissions(User user) async {
-    final userPermissionsResponse = await UserPermissionRepository().get(user.id);
-    return userPermissionsResponse ?? UserPermissions.fromDataModel(user);
+class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
+  List<data.Role>? _availableRoles;
+  List<data.Permission>? _availablePermissions;
+  PageStateStatus _status = PageStateStatus.loading;
+
+  UserPermissions? _model;
+  final _permissionSet = HashSet<String>();
+  final _roleSet = HashSet<String>();
+
+  @override
+  initState() {
+    super.initState();
+
+    RoleRepository().getAll().then((List<data.Role> value) {
+      _availableRoles = value;
+      _updatePageStatus();
+    });
+
+    PermissionRepository().getAll().then((List<data.Permission> value) {
+      _availablePermissions = value;
+      _updatePageStatus();
+    });
+
+    UserPermissionRepository().get(widget.user.id).then((UserPermissions? value) {
+      _model = value ?? UserPermissions.fromDataModel(widget.user);
+      _permissionSet.addAll(_model!.permissions);
+      _roleSet.addAll(_model!.roles);
+      _updatePageStatus();
+    });
+  }
+
+  void _updatePageStatus() {
+    if (_model != null && _availableRoles != null && _availablePermissions != null) {
+      setState(() {
+        _status = PageStateStatus.loaded;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_status == PageStateStatus.loading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${user.id} - ${user.firstName} ${user.lastName}'),
-      ),
-      body: FutureBuilder<UserPermissions>(
-        future: _getUserPermissions(user),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('An error has occurred!'),
-            );
-          } else if (snapshot.hasData) {
-            final model = snapshot.data!;
-            return Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text('Edit Permissions', style: Theme.of(context).textTheme.titleLarge),
-                if (model.permissions.isNotEmpty)
-                  ListView.builder(
-                    itemCount: model.permissions.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(title: Text(model.permissions[index]));
-                    },
-                  )
-                else
-                  const Text('No permissions found'),
-                const SizedBox(height: 10),
-                Text('Edit Roles', style: Theme.of(context).textTheme.titleLarge),
-                if (model.roles.isNotEmpty)
-                  ListView.builder(
-                    itemCount: model.roles.length,
-                    itemBuilder: (context, index) {
-                      final role = model.roles[index];
-                      return ListTile(title: Text(role.name));
-                    },
-                  )
-                else
-                  const Text('No roles found'),
-              ],
-            ));
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
-    );
+        appBar: AppBar(
+          title: Text('${widget.user.id} - ${widget.user.firstName} ${widget.user.lastName}'),
+        ),
+        body: Column(
+          children: [
+            _buildPermissionsCheckBoxList(context),
+            _buildRolesCheckBoxList(context),
+            _buildSaveButton(context)
+          ],
+        ));
   }
+
+  Widget _buildSaveButton(BuildContext context) {
+    return TextButton(
+        onPressed: () {
+          setState(() {
+            _status = PageStateStatus.loading;
+          });
+          final newModel = UserPermissions.fromDataModel(widget.user);
+          newModel.permissions.addAll(_permissionSet);
+          newModel.roles.addAll(_roleSet);
+          UserPermissionRepository().upsert(newModel).then((_) {
+            setState(() {
+              _model = newModel;
+              _status = PageStateStatus.loaded;
+            });
+          });
+        },
+        child: const Text('Save'));
+  }
+
+  Widget _buildPermissionsCheckBoxList(BuildContext context) {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text('Edit Permissions', style: Theme.of(context).textTheme.titleLarge),
+        ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: _availablePermissions!.length,
+          itemBuilder: (context, index) {
+            var permission = _availablePermissions![index];
+            return CheckboxListTile(
+              title: Text(permission.name),
+              onChanged: (bool? value) {
+                if (value == null) return;
+
+                if (value == true) {
+                  _permissionSet.add(permission.name);
+                } else {
+                  _permissionSet.remove(permission.name);
+                }
+                setState(() {});
+              },
+              value: _permissionSet.contains(permission.name),
+            );
+          },
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildRolesCheckBoxList(BuildContext context) {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text('Edit Roles', style: Theme.of(context).textTheme.titleLarge),
+        ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: _availableRoles!.length,
+          itemBuilder: (context, index) {
+            var role = _availableRoles![index];
+            return CheckboxListTile(
+              title: Text(role.name),
+              onChanged: (bool? value) {
+                if (value == null) return;
+
+                if (value == true) {
+                  _roleSet.add(role.name);
+                } else {
+                  _roleSet.remove(role.name);
+                }
+                setState(() {});
+              },
+              value: _roleSet.contains(role.name),
+            );
+          },
+        ),
+      ],
+    ));
+  }
+}
+
+enum PageStateStatus {
+  loading,
+  loaded,
 }
