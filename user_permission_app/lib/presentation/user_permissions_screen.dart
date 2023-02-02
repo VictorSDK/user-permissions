@@ -17,55 +17,110 @@ class UserPermissionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${user.id} - ${user.firstName} ${user.lastName}'),
+        backgroundColor: const Color.fromRGBO(45, 164, 233, 1),
+        title: Text('${user.firstName} ${user.lastName}'),
       ),
-      body: FutureBuilder<UserPermissions>(
-        future: _getUserPermissions(user),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('An error has occurred!'),
-            );
-          } else if (snapshot.hasData) {
-            final model = snapshot.data!;
-            return Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Permissions', style: Theme.of(context).textTheme.titleLarge),
-                if (model.permissions.isNotEmpty)
-                  ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: model.permissions.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(title: Text(model.permissions[index]));
-                    },
-                  )
-                else
-                  const Text('No permissions found'),
-                const SizedBox(height: 10),
-                Text('Roles', style: Theme.of(context).textTheme.titleLarge),
-                if (model.roles.isNotEmpty)
-                  ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: model.roles.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(title: Text(model.roles[index]));
-                    },
-                  )
-                else
-                  const Text('No roles found'),
-              ],
-            ));
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          Hero(
+            tag: 'userId-${user.id}',
+            child: CircleAvatar(
+                backgroundColor: const Color.fromRGBO(45, 164, 233, 1),
+                radius: 50,
+                child: Text(user.firstName[0],
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(fontSize: 50, color: Colors.white))),
+          ),
+          const SizedBox(height: 20),
+          Align(
+              alignment: Alignment.center,
+              child: Text('${user.firstName} ${user.lastName}',
+                  style: Theme.of(context).textTheme.titleLarge!)),
+          const SizedBox(height: 20),
+          Expanded(
+            child: FutureBuilder<UserPermissions>(
+              future: _getUserPermissions(user),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text('An error has occurred!'),
+                  );
+                } else if (snapshot.hasData) {
+                  final model = snapshot.data!;
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Card(
+                      child: ListView(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+                            child: Text('Permissions',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                          ),
+                          if (model.permissions.isNotEmpty)
+                            ListView.builder(
+                              padding: const EdgeInsets.all(15),
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: model.permissions.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(title: Text(model.permissions[index]));
+                              },
+                            )
+                          else
+                            Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Text('No permissions found',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(color: Colors.grey))),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+                            child: Text('Roles',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                          ),
+                          if (model.roles.isNotEmpty)
+                            ListView.builder(
+                              padding: const EdgeInsets.all(15),
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: model.roles.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(title: Text(model.roles[index]));
+                              },
+                            )
+                          else
+                            Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Text('No roles found',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(color: Colors.grey))),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

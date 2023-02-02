@@ -64,22 +64,44 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_status == PageStateStatus.loading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
     return Scaffold(
         appBar: AppBar(
-          title: Text('${widget.user.id} - ${widget.user.firstName} ${widget.user.lastName}'),
+          backgroundColor: const Color.fromRGBO(45, 164, 233, 1),
+          title: const Text('Manage Permission and Roles'),
         ),
         body: Center(
-          child: Column(
-            children: [
-              _buildPermissionsCheckBoxList(context),
-              _buildRolesCheckBoxList(context),
-              _buildSaveButton(context)
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ListView(
+              children: [
+                Hero(
+                  tag: 'userId-${widget.user.id}',
+                  child: CircleAvatar(
+                      backgroundColor: const Color.fromRGBO(45, 164, 233, 1),
+                      radius: 50,
+                      child: Text(widget.user.firstName[0],
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(fontSize: 50, color: Colors.white))),
+                ),
+                const SizedBox(height: 20),
+                Align(
+                    alignment: Alignment.center,
+                    child: Text('${widget.user.firstName} ${widget.user.lastName}',
+                        style: Theme.of(context).textTheme.titleLarge!)),
+                const SizedBox(height: 20),
+                if (_status == PageStateStatus.loading)
+                  const Center(child: CircularProgressIndicator()),
+                if (_status == PageStateStatus.loaded) ...[
+                  _buildPermissionsCheckBoxList(context),
+                  const SizedBox(height: 20),
+                  _buildRolesCheckBoxList(context),
+                  const SizedBox(height: 20),
+                  _buildSaveButton(context)
+                ]
+              ],
+            ),
           ),
         ));
   }
@@ -101,15 +123,24 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
           });
         },
-        child: const Text('Save'));
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('Save',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.white)),
+        ));
   }
 
   Widget _buildPermissionsCheckBoxList(BuildContext context) {
-    return Center(
+    return Card(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Edit Permissions', style: Theme.of(context).textTheme.titleLarge),
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: Text('Permissions',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)),
+        ),
         ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
@@ -139,11 +170,16 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
   }
 
   Widget _buildRolesCheckBoxList(BuildContext context) {
-    return Center(
+    return Card(
         child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text('Edit Roles', style: Theme.of(context).textTheme.titleLarge),
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Text('Roles',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)),
+        ),
         ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,

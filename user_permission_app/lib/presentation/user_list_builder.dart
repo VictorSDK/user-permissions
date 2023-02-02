@@ -32,10 +32,19 @@ class _UserListBuilderState extends State<UserListBuilder> {
                   )
                 },
             title: Text('${user.firstName} ${user.lastName}'),
-            leading: CircleAvatar(child: Text(user.firstName[0])),
+            leading: Hero(
+                tag: 'userId-${user.id}',
+                child: CircleAvatar(
+                    backgroundColor: const Color.fromRGBO(45, 164, 233, 1),
+                    child: Text(user.firstName[0],
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge!
+                            .copyWith(color: Colors.white)))),
             trailing: IconButton(
                 onPressed: () {
-                  Navigator.of(context).push(
+                  Navigator.push(
+                    context,
                     MaterialPageRoute(
                       builder: (context) => UserPermissionEditScreen(user: user),
                     ),
