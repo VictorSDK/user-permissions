@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:user_permission_app/data/models/user.dart';
 import 'package:user_permission_app/data/repositories/user_permissions_repository.dart';
 import 'package:user_permission_app/data/models/user_permissions.dart';
+import 'package:user_permission_app/presentation/user_avatar.dart';
 
 class UserPermissionScreen extends StatelessWidget {
   const UserPermissionScreen({super.key, required this.user});
@@ -22,24 +23,7 @@ class UserPermissionScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 20),
-          Hero(
-            tag: 'userId-${user.id}',
-            child: CircleAvatar(
-                backgroundColor: const Color.fromRGBO(45, 164, 233, 1),
-                radius: 50,
-                child: Text(user.firstName[0],
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(fontSize: 50, color: Colors.white))),
-          ),
-          const SizedBox(height: 20),
-          Align(
-              alignment: Alignment.center,
-              child: Text('${user.firstName} ${user.lastName}',
-                  style: Theme.of(context).textTheme.titleLarge!)),
-          const SizedBox(height: 20),
+          UserAvatar(user: user),
           Expanded(
             child: FutureBuilder<UserPermissions>(
               future: _getUserPermissions(user),

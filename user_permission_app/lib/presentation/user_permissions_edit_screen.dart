@@ -5,6 +5,7 @@ import 'package:user_permission_app/data/repositories/permission_repository.dart
 import 'package:user_permission_app/data/repositories/role_repository.dart';
 import 'package:user_permission_app/data/repositories/user_permissions_repository.dart';
 import 'package:user_permission_app/data/models/user_permissions.dart';
+import 'package:user_permission_app/presentation/user_avatar.dart';
 
 class UserPermissionEditScreen extends StatefulWidget {
   const UserPermissionEditScreen({super.key, required this.user});
@@ -71,26 +72,10 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.only(bottom: 20, right: 20, left: 20),
             child: ListView(
               children: [
-                Hero(
-                  tag: 'userId-${widget.user.id}',
-                  child: CircleAvatar(
-                      backgroundColor: const Color.fromRGBO(45, 164, 233, 1),
-                      radius: 50,
-                      child: Text(widget.user.firstName[0],
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(fontSize: 50, color: Colors.white))),
-                ),
-                const SizedBox(height: 20),
-                Align(
-                    alignment: Alignment.center,
-                    child: Text('${widget.user.firstName} ${widget.user.lastName}',
-                        style: Theme.of(context).textTheme.titleLarge!)),
-                const SizedBox(height: 20),
+                UserAvatar(user: widget.user),
                 if (_status == PageStateStatus.loading)
                   const Center(child: CircularProgressIndicator()),
                 if (_status == PageStateStatus.loaded) ...[
