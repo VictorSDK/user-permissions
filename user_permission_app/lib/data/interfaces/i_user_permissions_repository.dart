@@ -1,4 +1,4 @@
-import 'package:user_permission_app/domain/models/user_permissions.dart';
+import 'package:user_permission_app/data/models/user_permissions.dart';
 
 abstract class IUserPermissionRepository {
   Future upsert(UserPermissions user);

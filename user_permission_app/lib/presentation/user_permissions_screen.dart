@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:user_permission_app/data/models/user.dart';
 import 'package:user_permission_app/data/repositories/user_permissions_repository.dart';
-import 'package:user_permission_app/domain/models/user_permissions.dart';
+import 'package:user_permission_app/data/models/user_permissions.dart';
 
 class UserPermissionScreen extends StatelessWidget {
   const UserPermissionScreen({super.key, required this.user});

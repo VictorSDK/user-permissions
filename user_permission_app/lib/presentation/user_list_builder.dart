@@ -16,22 +16,23 @@ class UserListBuilder extends StatefulWidget {
 }
 
 class _UserListBuilderState extends State<UserListBuilder> {
-   
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      padding: const EdgeInsets.all(20),
       itemCount: widget.users.length,
       itemBuilder: (context, index) {
         var user = widget.users[index];
         return ListTile(
-          onTap: () => {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => UserPermissionScreen(user: user),
-              ),
-            )
-          },
-            title: Text('${user.id} - ${user.firstName} ${user.lastName}'),
+            onTap: () => {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => UserPermissionScreen(user: user),
+                    ),
+                  )
+                },
+            title: Text('${user.firstName} ${user.lastName}'),
+            leading: CircleAvatar(child: Text(user.firstName[0])),
             trailing: IconButton(
                 onPressed: () {
                   Navigator.of(context).push(
@@ -40,8 +41,7 @@ class _UserListBuilderState extends State<UserListBuilder> {
                     ),
                   );
                 },
-                icon: const Icon(Icons.edit))
-        );
+                icon: const Icon(Icons.edit)));
       },
     );
   }
