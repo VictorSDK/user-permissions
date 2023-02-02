@@ -11,9 +11,9 @@ class PermissionRepository implements IPermissionRepository {
     return parsed.map<Permission>((json) => Permission.fromJson(json)).toList();
   }
 
-  Future<List<Permission>> getAll(http.Client client) async {
-    final response = await client
-        .get(Uri.parse('https://61fc4baf3f1e34001792c875.mockapi.io/api/v1/permissions'));
+  @override
+  Future<List<Permission>> getAll() async {
+    final response = await http.Client().get(Uri.parse('https://61fc4baf3f1e34001792c875.mockapi.io/api/v1/permissions'));
 
     if (response.statusCode == 200) {
       var roles = parsePermissions(response.body);

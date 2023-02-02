@@ -11,8 +11,9 @@ class RoleRepository implements IRoleRepository {
     return parsed.map<Role>((json) => Role.fromJson(json)).toList();
   }
 
-  Future<List<Role>> getAll(http.Client client) async {
-    final response = await client
+  @override
+  Future<List<Role>> getAll() async {
+    final response = await http.Client()
         .get(Uri.parse('https://61fc4baf3f1e34001792c875.mockapi.io/api/v1/roles'));
 
     if (response.statusCode == 200) {

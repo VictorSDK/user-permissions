@@ -11,8 +11,9 @@ class UserRepository implements IUserRepository {
     return parsed.map<User>((json) => User.fromJson(json)).toList();
   }
 
-  Future<List<User>> getAll(http.Client client) async {
-    final response = await client
+  @override
+  Future<List<User>> getAll() async {
+    final response = await http.Client()
         .get(Uri.parse('https://61fc4baf3f1e34001792c875.mockapi.io/api/v1/users'));
 
     if (response.statusCode == 200) {

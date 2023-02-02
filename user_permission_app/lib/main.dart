@@ -3,7 +3,6 @@ import 'package:user_permission_app/data/repositories/user_repository.dart';
 import 'package:user_permission_app/presentation/user_list_builder.dart';
 
 import 'data/models/user.dart';
-import 'package:http/http.dart' as http;
 
 void main() {
    WidgetsFlutterBinding.ensureInitialized();
@@ -38,18 +37,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: FutureBuilder<List<User>>(
-        future: UserRepository().getAll(http.Client()),
+        future: UserRepository().getAll(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(
