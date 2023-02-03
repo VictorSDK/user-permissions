@@ -1,4 +1,3 @@
-
 import 'package:user_permission_app/data/models/models.dart';
 
 class UserPermissions {
@@ -28,12 +27,4 @@ class UserPermissions {
       roles: (map['roles'] as List).map((e) => e as String).toList(),
     );
   }
-}
-
-class Role {
-  Role({required this.id, required this.name, required this.permissions});
-
-  final String id;
-  final String name;
-  final List<String> permissions;
 }

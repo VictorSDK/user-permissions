@@ -23,7 +23,6 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
   UserPermissions? _model;
   final _permissionSet = HashSet<String>();
   final _roleSet = HashSet<String>();
-  final _rolesByPermission = <String, List<String>>{};
 
   @override
   initState() {
@@ -31,14 +30,6 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
 
     RoleRepository().getAll().then((List<Role> value) {
       _availableRoles = value;
-      for (var role in _availableRoles!) {
-        for (var permission in role.permissions) {
-          if (!_rolesByPermission.containsKey(permission)) {
-            _rolesByPermission[permission] = <String>[];
-          }
-          _rolesByPermission[permission]!.add(role.name);
-        }
-      }
       _updatePageStatus();
     });
 
@@ -141,8 +132,6 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
                   _permissionSet.add(permission.name);
                 } else {
                   _permissionSet.remove(permission.name);
-                  final roles = _rolesByPermission[permission.name];
-                  _roleSet.removeAll(roles!);
                 }
                 setState(() {});
               },
@@ -188,10 +177,8 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
 
                 if (value == true) {
                   _roleSet.add(role.name);
-                  _permissionSet.addAll(role.permissions);
                 } else {
                   _roleSet.remove(role.name);
-                  _permissionSet.removeAll(role.permissions);
                 }
                 setState(() {});
               },

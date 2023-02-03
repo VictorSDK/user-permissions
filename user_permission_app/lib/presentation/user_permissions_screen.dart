@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:user_permission_app/data/models/user.dart';
+import 'package:user_permission_app/data/models/models.dart';
+import 'package:user_permission_app/data/repositories/role_repository.dart';
 import 'package:user_permission_app/data/repositories/user_permissions_repository.dart';
-import 'package:user_permission_app/data/models/user_permissions.dart';
 import 'package:user_permission_app/presentation/user_avatar.dart';
 
 class UserPermissionScreen extends StatelessWidget {
@@ -9,9 +9,23 @@ class UserPermissionScreen extends StatelessWidget {
 
   final User user;
 
-  Future<UserPermissions> _getUserPermissions(User user) async {
-    final userPermissionsResponse = await UserPermissionRepository().get(user.id);
-    return userPermissionsResponse ?? UserPermissions.fromDataModel(user);
+  Future<PermissionsAndRoles> _getUserPermissions(User user) async {
+    final userPermissions = await UserPermissionRepository().get(user.id);
+
+    if (userPermissions == null) {
+      return PermissionsAndRoles(permissions: <String>[], roles: <Role>[]);
+    }
+
+    var userRoles = <Role>[];
+    if (userPermissions.roles.isNotEmpty) {
+      final roles = await RoleRepository().getAll();
+
+      for (var roleName in userPermissions.roles) {
+        userRoles.add(roles.firstWhere((e) => e.name == roleName));
+      }
+    }
+
+    return PermissionsAndRoles(permissions: userPermissions.permissions, roles: userRoles);
   }
 
   @override
@@ -25,7 +39,7 @@ class UserPermissionScreen extends StatelessWidget {
         children: [
           UserAvatar(user: user),
           Expanded(
-            child: FutureBuilder<UserPermissions>(
+            child: FutureBuilder<PermissionsAndRoles>(
               future: _getUserPermissions(user),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
@@ -81,16 +95,17 @@ class UserPermissionScreen extends StatelessWidget {
                               shrinkWrap: true,
                               itemCount: model.roles.length,
                               itemBuilder: (context, index) {
+                                final role = model.roles[index];
                                 return ListTile(
-                                  title: Text(model.roles[index]),
+                                  title: Text(role.name),
                                   subtitle: ListView.builder(
                                       scrollDirection: Axis.vertical,
                                       shrinkWrap: true,
-                                      itemCount: 1,
+                                      itemCount: role.permissions.length,
                                       itemBuilder: (context, index) {
-                                        return const Padding(
-                                          padding: EdgeInsets.only(left: 8.0),
-                                          child: Text('role.permissions[index]'),
+                                        return Padding(
+                                          padding: const EdgeInsets.only(left: 8.0),
+                                          child: Text(role.permissions[index]),
                                         );
                                       }),
                                 );
@@ -120,4 +135,11 @@ class UserPermissionScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class PermissionsAndRoles {
+  PermissionsAndRoles({required this.permissions, required this.roles});
+
+  final List<String> permissions;
+  final List<Role> roles;
 }

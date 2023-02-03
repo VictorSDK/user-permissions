@@ -43,8 +43,7 @@ class _UserListBuilderState extends State<UserListBuilder> {
                             .copyWith(color: Colors.white)))),
             trailing: IconButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
+                  Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => UserPermissionEditScreen(user: user),
                     ),
