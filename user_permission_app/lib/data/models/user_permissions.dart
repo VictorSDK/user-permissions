@@ -1,22 +1,13 @@
-import 'package:user_permission_app/data/models/models.dart' as data;
+
+import 'package:user_permission_app/data/models/models.dart';
 
 class UserPermissions {
-  UserPermissions(
-      {required this.id,
-      required this.firstName,
-      required this.lastName,
-      required this.permissions,
-      required this.roles});
+  UserPermissions({required this.userId, required this.permissions, required this.roles});
 
-  UserPermissions.fromDataModel(data.User user)
-      : this(
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            permissions: <String>[],
-            roles: <String>[]);
+  UserPermissions.fromDataModel(User user)
+      : this(userId: user.id, permissions: <String>[], roles: <String>[]);
 
-  late final String id;
+  late final String userId;
   late final String firstName;
   late final String lastName;
   late final List<String> permissions;
@@ -24,9 +15,7 @@ class UserPermissions {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
+      'id': userId,
       'permissions': permissions,
       'roles': roles,
     };
@@ -34,9 +23,7 @@ class UserPermissions {
 
   factory UserPermissions.fromMap(Map<String, dynamic> map) {
     return UserPermissions(
-      id: map['id'],
-      firstName: map['firstName'],
-      lastName: map['lastName'],
+      userId: map['id'],
       permissions: (map['permissions'] as List).map((e) => e as String).toList(),
       roles: (map['roles'] as List).map((e) => e as String).toList(),
     );

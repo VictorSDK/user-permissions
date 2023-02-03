@@ -81,7 +81,19 @@ class UserPermissionScreen extends StatelessWidget {
                               shrinkWrap: true,
                               itemCount: model.roles.length,
                               itemBuilder: (context, index) {
-                                return ListTile(title: Text(model.roles[index]));
+                                return ListTile(
+                                  title: Text(model.roles[index]),
+                                  subtitle: ListView.builder(
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount: 1,
+                                      itemBuilder: (context, index) {
+                                        return const Padding(
+                                          padding: EdgeInsets.only(left: 8.0),
+                                          child: Text('role.permissions[index]'),
+                                        );
+                                      }),
+                                );
                               },
                             )
                           else

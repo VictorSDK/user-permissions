@@ -1,24 +1,24 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:user_permission_app/data/models/models.dart' as data;
+import 'package:user_permission_app/data/models/models.dart';
 import 'package:user_permission_app/data/repositories/permission_repository.dart';
 import 'package:user_permission_app/data/repositories/role_repository.dart';
 import 'package:user_permission_app/data/repositories/user_permissions_repository.dart';
-import 'package:user_permission_app/data/models/user_permissions.dart';
+import 'package:user_permission_app/presentation/page_state_status.dart';
 import 'package:user_permission_app/presentation/user_avatar.dart';
 
 class UserPermissionEditScreen extends StatefulWidget {
   const UserPermissionEditScreen({super.key, required this.user});
-  final data.User user;
+  final User user;
 
   @override
   State<UserPermissionEditScreen> createState() => _UserPermissionEditScreen();
 }
 
 class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
-  List<data.Role>? _availableRoles;
-  List<data.Permission>? _availablePermissions;
-  PageStateStatus _status = PageStateStatus.loading;
+  List<Role>? _availableRoles;
+  List<Permission>? _availablePermissions;
+  PageStateStatus _pageStatus = PageStateStatus.loading;
 
   UserPermissions? _model;
   final _permissionSet = HashSet<String>();
@@ -29,7 +29,7 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
   initState() {
     super.initState();
 
-    RoleRepository().getAll().then((List<data.Role> value) {
+    RoleRepository().getAll().then((List<Role> value) {
       _availableRoles = value;
       for (var role in _availableRoles!) {
         for (var permission in role.permissions) {
@@ -42,7 +42,7 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
       _updatePageStatus();
     });
 
-    PermissionRepository().getAll().then((List<data.Permission> value) {
+    PermissionRepository().getAll().then((List<Permission> value) {
       _availablePermissions = value;
       _updatePageStatus();
     });
@@ -58,7 +58,7 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
   void _updatePageStatus() {
     if (_model != null && _availableRoles != null && _availablePermissions != null) {
       setState(() {
-        _status = PageStateStatus.loaded;
+        _pageStatus = PageStateStatus.loaded;
       });
     }
   }
@@ -76,9 +76,9 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
             child: ListView(
               children: [
                 UserAvatar(user: widget.user),
-                if (_status == PageStateStatus.loading)
+                if (_pageStatus == PageStateStatus.loading)
                   const Center(child: CircularProgressIndicator()),
-                if (_status == PageStateStatus.loaded) ...[
+                if (_pageStatus == PageStateStatus.loaded) ...[
                   _buildPermissionsCheckBoxList(context),
                   const SizedBox(height: 20),
                   _buildRolesCheckBoxList(context),
@@ -95,7 +95,7 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
     return ElevatedButton(
         onPressed: () {
           setState(() {
-            _status = PageStateStatus.loading;
+            _pageStatus = PageStateStatus.loading;
           });
           final newModel = UserPermissions.fromDataModel(widget.user);
           newModel.permissions.addAll(_permissionSet);
@@ -103,7 +103,7 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
           UserPermissionRepository().upsert(newModel).then((_) {
             setState(() {
               _model = newModel;
-              _status = PageStateStatus.loaded;
+              _pageStatus = PageStateStatus.loaded;
             });
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
           });
@@ -173,6 +173,16 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
             var role = _availableRoles![index];
             return CheckboxListTile(
               title: Text(role.name),
+              subtitle: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: role.permissions.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(role.permissions[index]),
+                    );
+                  }),
               onChanged: (bool? value) {
                 if (value == null) return;
 
@@ -192,9 +202,4 @@ class _UserPermissionEditScreen extends State<UserPermissionEditScreen> {
       ],
     ));
   }
-}
-
-enum PageStateStatus {
-  loading,
-  loaded,
 }
