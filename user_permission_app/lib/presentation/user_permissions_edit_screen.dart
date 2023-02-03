@@ -5,7 +5,7 @@ import 'package:user_permission_app/data/repositories/permission_repository.dart
 import 'package:user_permission_app/data/repositories/role_repository.dart';
 import 'package:user_permission_app/data/repositories/user_permissions_repository.dart';
 import 'package:user_permission_app/presentation/page_state_status.dart';
-import 'package:user_permission_app/presentation/user_avatar.dart';
+import 'package:user_permission_app/presentation/Widgets/user_avatar.dart';
 
 class UserPermissionEditScreen extends StatefulWidget {
   const UserPermissionEditScreen({super.key, required this.user});

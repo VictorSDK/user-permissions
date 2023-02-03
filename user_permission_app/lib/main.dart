@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:user_permission_app/data/repositories/user_repository.dart';
-import 'package:user_permission_app/presentation/user_list_builder.dart';
+import 'package:user_permission_app/presentation/Widgets/user_list_builder.dart';
 
 import 'data/models/user.dart';
 
